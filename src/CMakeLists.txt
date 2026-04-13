@@ -53,21 +53,21 @@ target_compile_definitions(drivers PUBLIC
 # ================================================
 if(BUILD_EXAMPLES)
     # --- USART Example ---
-    add_executable(usart-example
-        examples/usart-example.c
+    add_executable(usart_example
+        examples/usart_example.c
     )
-    target_link_libraries(usart-example PRIVATE drivers)
-    target_include_directories(usart-example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(usart_example PRIVATE drivers)
+    target_include_directories(usart_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     # --- SPI Example ---
-    add_executable(spi-example
-        examples/spi-example.c
+    add_executable(spi_example
+        examples/spi_example.c
     )
-    target_link_libraries(spi-example PRIVATE drivers)
-    target_include_directories(spi-example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(spi_example PRIVATE drivers)
+    target_include_directories(spi_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
     # Post-build: generar .bin y mostrar tamaño
-    foreach(target usart-example spi-example)
+    foreach(target usart_example spi_example)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_OBJCOPY} -O binary ${target} ${target}.bin
             COMMAND ${CMAKE_SIZE} ${target}
@@ -75,6 +75,23 @@ if(BUILD_EXAMPLES)
         )
     endforeach()
 endif()
+
+# Startup + System
+add_library(startup OBJECT
+    startup_stm32f407xx.s
+    system_stm32f4xx.c
+)
+
+target_include_directories(startup PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# Linkear todo correctamente
+target_link_libraries(drivers PRIVATE startup)
+
+# Linker script para los ejemplos
+set_target_properties(usart_example spi_example PROPERTIES
+    LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections"
 
 # ================================================
 # Mensajes finales
