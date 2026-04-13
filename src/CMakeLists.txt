@@ -76,12 +76,6 @@ if(BUILD_EXAMPLES)
     endforeach()
 endif()
 
-# Startup + System
-add_library(startup OBJECT
-    startup_stm32f407xx.s
-    system_stm32f4xx.c
-)
-
 target_include_directories(startup PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -93,6 +87,18 @@ target_link_libraries(drivers PRIVATE startup)
 set_target_properties(usart_example spi_example PROPERTIES
     LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections"
 
+# Startup + System    
+add_library(hal STATIC
+    usart.c spi.c i2c.c gpio.c timer.c
+    startup_stm32f407xx.s system_stm32f4xx.c
+)
+
+target_include_directories(hal PUBLIC . freertos)
+
+add_executable(main.elf main.c)
+target_link_libraries(main.elf hal)
+set_target_properties(main.elf PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld")
+    
 # ================================================
 # Mensajes finales
 # ================================================
