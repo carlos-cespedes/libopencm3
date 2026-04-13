@@ -76,6 +76,11 @@ if(BUILD_EXAMPLES)
     endforeach()
 endif()
 
+add_library(startup OBJECT
+    system_stm32f4xx.c
+    # startup_stm32f407xx.s   ← si tienes el startup assembly
+)
+
 target_include_directories(startup PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -85,7 +90,7 @@ target_link_libraries(drivers PRIVATE startup)
 
 # Linker script para los ejemplos
 set_target_properties(usart_example spi_example PROPERTIES
-    LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections"
+    LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections")
 
 # Startup + System    
 add_library(hal STATIC
