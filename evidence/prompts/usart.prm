@@ -1,0 +1,38 @@
+Eres un experto senior en firmware embebido para ARM Cortex-M con más de 15 años de experiencia en HAL, RTOS y drivers de periféricos. Vamos a crear una implementación COMPLETAMENTE NUEVA y limpia (clean-room) de un driver USART/UART completo para STM32F4/F7 series, bajo licencia Apache 2.0.
+
+**REGLAS ESTRÍCTAS DE CLEAN-ROOM (obligatorias, no las violes nunca):**
+- NO uses, copies, ni te inspires en código fuente de libopencm3, STM32CubeHAL, ni ningún otro repositorio open-source. 
+- Basea TODO exclusivamente en los datasheets públicos oficiales de STMicroelectronics para STM32F4/F7 (RM0090 y RM0385).
+- Genera código 100 % original, estructurado, eficiente, seguro y bien comentado.
+- Evita cualquier similitud estructural o de nombres internos con implementaciones existentes.
+
+**Licencia obligatoria:**
+- Usa Apache License 2.0 en TODOS los archivos de código fuente (header completo al inicio de cada .h y .c).
+- Genera también el archivo LICENSE completo con el texto oficial de Apache 2.0.
+- En el README menciona claramente que es Apache 2.0 y que es una alternativa permissiva a libopencm3.
+
+**Objetivo del driver:**
+Crear un HAL ligero, portable y de alto rendimiento para USART/UART en STM32F4/F7 (USART1 a USART6 + UART4/UART5). Debe ser drop-in compatible en API con la filosofía de libopencm3 pero más eficiente y sin copyleft.
+
+**Funcionalidades completas requeridas (todas incluidas desde el primer release):**
+- Inicialización completa (baudrate, word length, parity, stop bits, flow control: none/hardware).
+- Soporte para polling, interrupciones y DMA (TX y RX).
+- Funciones blocking y non-blocking.
+- Manejo completo de errores (overrun, framing, parity, noise).
+- Redirección de printf vía weak function (_write).
+- Soporte multi-instancia (USART1..6, UART4/5).
+- Cálculo correcto de baudrate (APB1/APB2) con oversampling 8/16.
+- Integración básica con FreeRTOS (semáforos y colas para RX/TX).
+
+**API exacta (no cambies los nombres ni la firma):**
+```c
+void usart_init(uint32_t usart_base, uint32_t baudrate, uint8_t databits, char parity, uint8_t stopbits, bool flow_control);
+void usart_set_baudrate(uint32_t usart_base, uint32_t baudrate);
+void usart_send_blocking(uint32_t usart_base, uint8_t data);
+uint8_t usart_recv_blocking(uint32_t usart_base);
+void usart_send_string(uint32_t usart_base, const char* str);
+void usart_enable_interrupt(uint32_t usart_base);
+void usart_disable_interrupt(uint32_t usart_base);
+void usart_dma_tx_start(uint32_t usart_base, const void* buffer, uint32_t length);
+void usart_dma_rx_start(uint32_t usart_base, void* buffer, uint32_t length);
+uint32_t usart_get_flag(uint32_t usart_base, uint32_t flag);  // para polling de flags
