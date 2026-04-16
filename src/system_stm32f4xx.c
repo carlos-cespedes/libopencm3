@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include "system_stm32f4xx.h"
 
+uint32_t SystemCoreClock = 168000000UL;
+
 /* ===================================================================
  * SystemInit - Configuración completa del reloj
  * =================================================================== */

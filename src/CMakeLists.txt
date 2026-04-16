@@ -4,105 +4,51 @@
 # ================================================
 
 cmake_minimum_required(VERSION 3.16)
-project(STM32_CleanRoom_Drivers LANGUAGES C)
-
-# ================================================
-# Configuración de toolchain ARM (ajusta según tu instalación)
-# ================================================
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR arm)
+project(STM32_CleanRoom_HAL LANGUAGES C ASM)   # ← ASM es importante
 
 set(TOOLCHAIN_PREFIX arm-none-eabi)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}-gcc)
-set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}-objcopy)
-set(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}-objdump)
-set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}-size)
 
-# Flags comunes para STM32F4/F7
 set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
-set(COMMON_FLAGS "${CPU_FLAGS} -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -std=gnu11")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -ffunction-sections -fdata-sections -Wall -Wextra -Os -std=gnu11")
+set(CMAKE_ASM_FLAGS "${CPU_FLAGS} -x assembler-with-cpp")
 
-set(CMAKE_C_FLAGS "${COMMON_FLAGS} -Os")
-set(CMAKE_EXE_LINKER_FLAGS "${CPU_FLAGS} -Wl,--gc-sections -Wl,-Map=output.map")
-
-# ================================================
-# Opciones del proyecto
-# ================================================
-option(BUILD_EXAMPLES "Build example applications" ON)
-
-# ================================================
-# Drivers (biblioteca estática)
-# ================================================
-add_library(drivers STATIC
+# ==================== DRIVERS (solo periféricos) ====================
+add_library(hal STATIC
     usart.c
     spi.c
+    i2c.c
+    gpio.c
+    timer.c
 )
 
-target_include_directories(drivers PUBLIC
+target_include_directories(hal PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/freertos
 )
 
-target_compile_definitions(drivers PUBLIC
-    PCLK1_FREQ=42000000UL
-    PCLK2_FREQ=84000000UL
+# ==================== EJECUTABLE FINAL ====================
+add_executable(main.elf
+    main.c
+    startup_stm32f407xx.s   # startup entry point
+    system_stm32f4xx.c      # system init
+    freertos/port.c         # minimal freertos 
 )
 
-# ================================================
-# Ejemplos
-# ================================================
-if(BUILD_EXAMPLES)
-    # --- USART Example ---
-    add_executable(usart_example
-        examples/usart_example.c
-    )
-    target_link_libraries(usart_example PRIVATE drivers)
-    target_include_directories(usart_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(main.elf PRIVATE hal)
 
-    # --- SPI Example ---
-    add_executable(spi_example
-        examples/spi_example.c
-    )
-    target_link_libraries(spi_example PRIVATE drivers)
-    target_include_directories(spi_example PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-    # Post-build: generar .bin y mostrar tamaño
-    foreach(target usart_example spi_example)
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} -O binary ${target} ${target}.bin
-            COMMAND ${CMAKE_SIZE} ${target}
-            COMMENT "Generando binario y mostrando tamaño..."
-        )
-    endforeach()
-endif()
-
-add_library(startup OBJECT
-    system_stm32f4xx.c
-    startup_stm32f407xx.s
+# Linker script
+set_target_properties(main.elf PROPERTIES
+    LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections -Wl,-Map=main.map"
 )
 
-target_include_directories(startup PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+# Post-build: generar .bin y mostrar tamaño
+add_custom_command(TARGET main.elf POST_BUILD
+    COMMAND ${TOOLCHAIN_PREFIX}-objcopy -O binary main.elf main.bin
+    COMMAND ${TOOLCHAIN_PREFIX}-size main.elf
+    COMMENT "Generando main.bin y mostrando tamaño..."
 )
-
-# Linkear todo correctamente
-target_link_libraries(drivers PRIVATE startup)
-
-# Linker script para los ejemplos
-set_target_properties(usart_example spi_example PROPERTIES
-    LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld -Wl,--gc-sections")
-
-# Startup + System    
-add_library(hal STATIC
-    usart.c spi.c i2c.c gpio.c timer.c
-    startup_stm32f407xx.s system_stm32f4xx.c
-)
-
-target_include_directories(hal PUBLIC . freertos)
-
-add_executable(main.elf main.c)
-target_link_libraries(main.elf hal)
-set_target_properties(main.elf PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VG.ld")
     
 # ================================================
 # Mensajes finales

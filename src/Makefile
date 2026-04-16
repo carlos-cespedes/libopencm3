@@ -22,7 +22,7 @@ OBJECTS = $(SOURCES:.c=.o)
 OBJECTS := $(OBJECTS:.s=.o)
 
 # Targets principales
-all: usart_example.bin spi_example.bin
+all: usart_example.bin spi_example.bin main.elf
 
 # Biblioteca drivers (estática)
 drivers.a: $(OBJECTS)
@@ -47,6 +47,11 @@ spi_example.bin: spi_example.elf
 	$(OBJCOPY) -O binary $< $@
 	@echo "=== SPI EXAMPLE ==="
 	$(SIZE) spi_example.elf
+
+# En lugar de linkear solo drivers.a
+main.elf: main.c startup_stm32f407xx.o system_stm32f4xx.o drivers.a
+	$(CC) $(CFLAGS) main.c startup_stm32f407xx.o system_stm32f4xx.o drivers.a \
+	      $(LDFLAGS) -o $@
 
 # Compilación de objetos
 %.o: %.c

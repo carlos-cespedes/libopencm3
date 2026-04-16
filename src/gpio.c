@@ -24,3 +24,8 @@ void gpio_init(uint32_t gpio_base, uint8_t pin, gpio_mode_t mode, gpio_pull_t pu
         GPIO_REG(gpio_base, 0x20 + idx*4) |= ((uint32_t)af << shift);
     }
 }
+
+void gpio_toggle(uint32_t gpio_base, uint8_t pin)
+{
+    GPIO_REG(gpio_base, 0x14) ^= (1U << pin);   /* ODR toggle */
+}
