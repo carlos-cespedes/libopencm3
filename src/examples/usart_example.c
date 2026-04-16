@@ -3,7 +3,7 @@
  * Apache License 2.0
  */
 
-#include "usart.h"
+#include "common_headers.h"
 #include <stdio.h>
 
 int main(void)
@@ -12,7 +12,7 @@ int main(void)
     usart_init(USART2_BASE, 115200, 8, 'N', 1, false);
 
     /* Redirección de printf a USART2 */
-    usart_stdio_base = USART2_BASE;
+    uint32_t usart_stdio_base = USART2_BASE;
 
     printf("=== STM32 USART Clean Room Driver ===\r\n");
     printf("Hola mundo desde USART2!\r\n");

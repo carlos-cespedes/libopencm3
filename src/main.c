@@ -9,7 +9,8 @@
 #include "i2c.h"
 #include "gpio.h"
 #include "timer.h"
-#include "freertos/FreeRTOS.h"
+#include "freertos/FreeRTOSConfig.h"
+#include "freertos/freertos.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 

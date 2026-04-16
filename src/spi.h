@@ -17,6 +17,7 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 

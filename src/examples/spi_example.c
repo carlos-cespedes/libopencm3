@@ -3,7 +3,7 @@
  * Apache License 2.0
  */
 
-#include "spi.h"
+#include "common_headers.h"
 #include <stdio.h>
 
 int main(void)

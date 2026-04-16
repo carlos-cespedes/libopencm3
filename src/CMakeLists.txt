@@ -78,7 +78,7 @@ endif()
 
 add_library(startup OBJECT
     system_stm32f4xx.c
-    # startup_stm32f407xx.s   ← si tienes el startup assembly
+    startup_stm32f407xx.s
 )
 
 target_include_directories(startup PUBLIC

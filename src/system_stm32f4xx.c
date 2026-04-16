@@ -21,23 +21,7 @@
  * ============================================================================ */
 
 #include <stdint.h>
-
-/* Registro base RCC (RM0090 Sección 7.3) */
-#define RCC_BASE            0x40023800UL
-#define RCC_CR              (*(volatile uint32_t*)(RCC_BASE + 0x00))
-#define RCC_PLLCFGR         (*(volatile uint32_t*)(RCC_BASE + 0x04))
-#define RCC_CFGR            (*(volatile uint32_t*)(RCC_BASE + 0x08))
-#define RCC_CIR             (*(volatile uint32_t*)(RCC_BASE + 0x0C))
-#define RCC_AHB1ENR         (*(volatile uint32_t*)(RCC_BASE + 0x30))
-#define RCC_APB1ENR         (*(volatile uint32_t*)(RCC_BASE + 0x40))
-#define RCC_APB2ENR         (*(volatile uint32_t*)(RCC_BASE + 0x44))
-
-/* Flash (RM0090 Sección 3.7) */
-#define FLASH_BASE          0x40023C00UL
-#define FLASH_ACR           (*(volatile uint32_t*)(FLASH_BASE + 0x00))
-
-/* Frecuencia del sistema (ajusta según tu MCU) */
-uint32_t SystemCoreClock = 168000000UL;   /* 168 MHz por defecto (STM32F4) */
+#include "system_stm32f4xx.h"
 
 /* ===================================================================
  * SystemInit - Configuración completa del reloj
@@ -79,10 +63,10 @@ void SystemInit(void)
     FLASH_ACR |= (1U << 10);     /* DCEN */
 
     /* 9. Habilitar FPU (Cortex-M4/M7) */
-    SCB->CPACR |= (0xF << 20);   /* CP10 y CP11 full access */
+    SCB_CPACR |= (0xF << 20);   /* CP10 y CP11 full access */
 
-    /* 10. Actualizar variable SystemCoreClock */
-    SystemCoreClock = 168000000UL;
+    /* 10. Actualizar Frecuencia del sistema (ajusta según tu MCU) */
+    SystemCoreClock = 168000000UL;   /* 168 MHz por defecto (STM32F4) */
 
     /* Restaurar interrupciones */
     __asm volatile("cpsie i");

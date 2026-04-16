@@ -17,6 +17,7 @@
 #ifndef USART_H
 #define USART_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
