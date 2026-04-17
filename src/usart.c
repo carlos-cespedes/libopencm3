@@ -34,6 +34,13 @@
 /* Macros de acceso directo a registros (eficiente y portable) */
 #define USART_REG(base, offset)     (*(volatile uint32_t*)((base) + (offset)))
 
+/* =============  GLOBALS  ===================== */
+/* ===================================================================
+ * Redirección débil de printf / _write (newlib)
+ * Por defecto usa USART1 - reasignable cambiando usart_stdio_base
+ * =================================================================== */
+uint32_t usart_stdio_base = USART1_BASE;
+
 /* ===================================================================
  * Cálculo interno de PCLK según base (APB1 o APB2)
  * =================================================================== */
@@ -302,7 +309,6 @@ uint32_t usart_get_flag(uint32_t usart_base, uint32_t flag)
  * Redirección débil de printf / _write (newlib)
  * Por defecto usa USART1 - reasignable cambiando usart_stdio_base
  * =================================================================== */
-static uint32_t usart_stdio_base = USART1_BASE;
 
 int _write(int file, char *ptr, int len) __attribute__((weak));
 int _write(int file, char *ptr, int len)

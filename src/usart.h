@@ -57,6 +57,9 @@
 #define PCLK2_FREQ      84000000UL   /* APB2 (USART1/6) */
 #endif
 
+/* =============  GLOBALS  ===================== */
+extern uint32_t usart_stdio_base;
+
 /* ===================================================================
  * API pública (exactamente la solicitada - no se modifican nombres ni firmas)
  * =================================================================== */
