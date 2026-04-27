@@ -1,0 +1,47 @@
+stages:
+  - build
+
+variables:
+  BUILD_TYPE: Release
+
+build:
+  image: ubuntu:24.04          # Modern, stable base (same as GitHub ubuntu-latest in 2026)
+
+  stage: build
+
+  # On pushes to main, dev branches activate ci/cd build pipeline
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+
+  cache:
+    key: arm-toolchain-13.2.Rel1
+    paths:
+      - arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/
+
+  before_script:
+    # Install required packages
+    - apt-get update -qq
+    - apt-get install -y cmake wget xz-utils
+
+    # Install exact same Arm GNU Toolchain 13.2.Rel1 for reproducibility
+    - |
+      TOOLCHAIN_DIR="arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi"
+      if [ ! -d "$TOOLCHAIN_DIR" ]; then
+        echo "Downloading Arm GNU Toolchain 13.2.Rel1..."
+        wget -q --no-check-certificate \
+          https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz
+        tar -xJf arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz
+      fi
+      export PATH="$(pwd)/$TOOLCHAIN_DIR/bin:$PATH"
+      echo "Toolchain ready → $(arm-none-eabi-gcc --version | head -n1)"
+
+  script:
+    # Configure for out of source tree build
+    - cmake -S src -B build -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+
+    # Build
+    - cmake --build build --config ${BUILD_TYPE}
+
+    # Test (runs ctest inside the build folder)
+    - cd build && ctest -C ${BUILD_TYPE} --output-on-failure
