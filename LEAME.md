@@ -8,8 +8,8 @@ El microcontrolador Cortex-M combina bajo consumo de potencia con una convenient
 ## Cómo compilar
 
 - mkdir build && cd build
-- cmake ..
-- make
+- cmake -S ../src
+- cmake --build .
 
 ### Cómo compilar solo los ejemplos:
 

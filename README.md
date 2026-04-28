@@ -5,11 +5,11 @@ This is a HAL Library with drivers for ARM Cortex®-M3 microcontroller, targeted
 It is released under permissive license Apache2.
 The Cortex-M combines low power comsumption with convenient integration of peripherals, communication protocols and ease of development.
 
-## How to build
+## How to build (out-of-source-tree build)
 
 - mkdir build && cd build
-- cmake ..
-- make
+- cmake -S ../src
+- cmake --build .
 
 ### How to build the examples only
 
