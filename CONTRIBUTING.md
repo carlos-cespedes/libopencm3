@@ -4,6 +4,27 @@ Thank you for your interest in contributing to **libopencm3**!
 
 We welcome all contributions: source code enhancements, bug reports, feature suggestions, documentation improvements.
 
+## Ideas for the next amazing thing
+
+Here are some ideas of how you may contribute to be a part of this amazing team.
+
+- A video or demo showing how to build and load binary on an actual board or system. 
+- Any basic video or demo printing a "Hello World" message on the USART console.
+- Any basic video or demo showing how to read from an actual SPI device, for example a sensor.
+- Extending the library with another driver device, for instance I2C, eth, usb.
+
+Look into using asciinema for the demos → https://asciinema.org/
+
+## Suggesting Features or Improvements
+
+We would love to hear what you want to see next in libopencm3!
+
+**[Please fill out our Feature Suggestion Survey]**
+**→ https://forms.gle/feh4sK1PcJQoqrXh9**
+
+This survey helps us prioritize the next features and improvements.
+You can also open a regular issue with the label **`enhancement`** if you prefer.
+
 ## Reporting Bugs
 
 If you find a bug, please open an issue and include:
@@ -15,16 +36,6 @@ If you find a bug, please open an issue and include:
 - Any relevant logs or screenshots
 
 **Please check first** that the issue has not already been reported.
-
-## Suggesting Features or Improvements
-
-We would love to hear what you want to see next in libopencm3!
-
-**[Please fill out our Feature Suggestion Survey]**
-**→ https://forms.gle/feh4sK1PcJQoqrXh9**
-
-This survey helps us prioritize the next features and improvements.
-You can also open a regular issue with the label **`enhancement`** if you prefer.
 
 ## Submitting Changes (Pull Requests)
 
